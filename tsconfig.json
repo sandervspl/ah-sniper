@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "module": "commonjs",
+        "target": "es6",
+        "removeComments": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "baseUrl": ".",
+        "paths": {
+          "config": ["config/index"],
+          "config/*": ["config/*"]
+        },
+        "lib": ["esnext"]
+    },
+    "exclude": ["node_modules"]
+}
