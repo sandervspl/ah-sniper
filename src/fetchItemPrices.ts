@@ -10,37 +10,6 @@ import { toTwoDigits } from './utils';
 const adapter = new FileSync('./db.json');
 const db = lowdb(adapter) as lowdb.LowdbSync<i.DB>;
 
-// Add upsert function
-db._.mixin({
-  upsert: function (arr, obj, arg) {
-    let item;
-
-    for (let i = 0; i < arr.length; i++) {
-      for (let j = 0; j < arg.length; j++) {
-        if (obj[arg[j]] !== arr[i][arg[j]]) {
-          item = undefined;
-          break;
-        } else {
-          item = i;
-        }
-      }
-    }
-
-    if (!item || arr[item] === undefined) {
-      arr.push(obj);
-    } else {
-      for (const key in arr[item]) {
-        if (!obj[key]) {
-          delete arr[item][key];
-        }
-      }
-
-      Object.assign(arr[item], obj);
-    }
-    return arr;
-  },
-});
-
 db
   .defaults({
     items: [],
@@ -76,13 +45,15 @@ export default async function fetchItemPrices() {
     const marketVal = mv && Number(mv.gold + toTwoDigits(mv.silver) + toTwoDigits(mv.copper));
 
     // Check if we need to fetch this item
-    const MIN_DIFF = Number(process.env.DB_INVALIDATE_MINUTES) * 6e4;
+    const MIN_TIME_DIFF = Number(process.env.DB_INVALIDATE_MINUTES) * 60000;
     const now = Date.now();
-    const dbValue = db.get('items').find({ id: item.id }).value();
+    const dbValue = db.get('items')
+      .find({ id: item.id })
+      .value();
 
     if (dbValue) {
       // Wait with sending another notification
-      if (now - dbValue.updatedAt < MIN_DIFF) {
+      if (now - dbValue.updatedAt < MIN_TIME_DIFF) {
         continue;
       }
 
@@ -97,18 +68,23 @@ export default async function fetchItemPrices() {
     const percDiff = (buyoutVal / marketVal) * 100;
 
     if (percDiff <= Number(process.env.PRICE_THRESHOLD)) {
-      const { gold,silver,copper } = item.minimumBuyout;
-      let value = '';
+      function genPriceString(price: i.PriceCoins) {
+        const { gold,silver,copper } = price;
+        let value = '';
 
-      if (gold && gold > 0) {
-        value += `${gold}g`;
+        if (gold && gold > 0) {
+          value += `${gold}g`;
+        }
+        if (silver && silver > 0) {
+          value += ` ${silver}s`;
+        }
+        if (copper && copper > 0) {
+          value += ` ${copper}c`;
+        }
+
+        return value;
       }
-      if (silver && silver > 0) {
-        value += ` ${silver}s`;
-      }
-      if (copper && copper > 0) {
-        value += ` ${copper}c`;
-      }
+
 
       /* eslint-disable */
       console.log(`Snipe!`);
@@ -122,20 +98,30 @@ export default async function fetchItemPrices() {
         },
         body: JSON.stringify({
           value1: item.name.full,
-          value2: value,
+          value2: `cur: ${genPriceString(mb)} - market: ${genPriceString(mv)}`,
           value3: item.icon,
         }),
       })
         .then(() => {
+          // Update
+          if (dbValue) {
+            db.get('items')
+              .find({ id: item.id })
+              .assign({ updatedAt: Date.now() })
+              .write();
+
+            return;
+          }
+
+          // Insert
           db.get('items')
-            // @ts-ignore
-            .upsert({
+            .push({
               id: item.id,
               name: itemSlug,
               updatedAt: Date.now(),
               marketVal,
               buyoutVal,
-            }, ['id'])
+            })
             .write();
         });
     }
