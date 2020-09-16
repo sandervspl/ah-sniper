@@ -51,7 +51,7 @@ export default async function fetchItemPrices() {
 
 
     // Check if we need to fetch this item
-    const MIN_DIFF = 9e5; // 15 minutes
+    const MIN_DIFF = Number(process.env.DB_INVALIDATE_MINUTES) * 6e4;
     const now = Date.now();
     const dbValue = db.get('items').find({ name }).value();
 
@@ -71,7 +71,7 @@ export default async function fetchItemPrices() {
     // If difference of minimum buyout is substantial then we notify users
     const percDiff = (marketVal / buyoutVal) * 100;
 
-    if (percDiff <= Number(process.env.THRESHOLD)) {
+    if (percDiff <= Number(process.env.PRICE_THRESHOLD)) {
       const { gold,silver,copper } = item.minimumBuyout;
       let value = '';
 

@@ -3,7 +3,8 @@ declare namespace NodeJS {
     ITEM_IDS: string;
     SERVER: string;
     FACTION: string;
-    THRESHOLD: string;
-    INTERVAL_SECONDS: string;
+    PRICE_THRESHOLD: string;
+    FETCH_INTERVAL_SECONDS: string;
+    DB_INVALIDATE_MINUTES: string;
   }
 }
