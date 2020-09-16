@@ -5,6 +5,7 @@ export type PriceCoins = {
 }
 
 export type ItemPrice = {
+  id: number;
   url: string;
   name: {
     slug: string;
@@ -20,6 +21,7 @@ export type ItemPrice = {
 
 export type DB = {
   items: {
+    id: number;
     name: string;
     updatedAt: number;
     marketVal: number;

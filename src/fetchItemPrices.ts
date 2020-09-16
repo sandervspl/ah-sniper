@@ -12,16 +12,32 @@ const db = lowdb(adapter) as lowdb.LowdbSync<i.DB>;
 
 // Add upsert function
 db._.mixin({
-  upsert: function (collection, obj, key) {
-    key = key || 'id';
-    for (var i = 0; i < collection.length; i++) {
-      var el = collection[i];
-      if (el[key] === obj[key]) {
-        collection[i] = obj;
-        return collection;
+  upsert: function (arr, obj, arg) {
+    let item;
+
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = 0; j < arg.length; j++) {
+        if (obj[arg[j]] !== arr[i][arg[j]]) {
+          item = undefined;
+          break;
+        } else {
+          item = i;
+        }
       }
-    };
-    collection.push(obj);
+    }
+
+    if (!item || arr[item] === undefined) {
+      arr.push(obj);
+    } else {
+      for (const key in arr[item]) {
+        if (!obj[key]) {
+          delete arr[item][key];
+        }
+      }
+
+      Object.assign(arr[item], obj);
+    }
+    return arr;
   },
 });
 
@@ -49,14 +65,20 @@ export default async function fetchItemPrices() {
 
 
     // Convert the g/s/c value to a single digit for easy compare
-    const buyoutVal = Number(item.minimumBuyout.gold + toTwoDigits(item.minimumBuyout.silver) + toTwoDigits(item.minimumBuyout.copper));
-    const marketVal = Number(item.marketValue.gold + toTwoDigits(item.marketValue.silver) + toTwoDigits(item.marketValue.copper));
+    const mb = item.minimumBuyout;
+    const mv = item.marketValue;
 
+    if (!mb || !mv) {
+      continue;
+    }
+
+    const buyoutVal = mb && Number(mb.gold + toTwoDigits(mb.silver) + toTwoDigits(mb.copper));
+    const marketVal = mv && Number(mv.gold + toTwoDigits(mv.silver) + toTwoDigits(mv.copper));
 
     // Check if we need to fetch this item
     const MIN_DIFF = Number(process.env.DB_INVALIDATE_MINUTES) * 6e4;
     const now = Date.now();
-    const dbValue = db.get('items').find({ name: itemSlug }).value();
+    const dbValue = db.get('items').find({ id: item.id }).value();
 
     if (dbValue) {
       // Wait with sending another notification
@@ -106,12 +128,14 @@ export default async function fetchItemPrices() {
       })
         .then(() => {
           db.get('items')
-            .push({
+            // @ts-ignore
+            .upsert({
+              id: item.id,
               name: itemSlug,
               updatedAt: Date.now(),
               marketVal,
               buyoutVal,
-            })
+            }, ['id'])
             .write();
         });
     }
