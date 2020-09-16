@@ -7,7 +7,7 @@ import { toTwoDigits } from './utils';
 
 
 // Database setup
-const adapter = new FileSync('src/db.json');
+const adapter = new FileSync('./db.json');
 const db = lowdb(adapter) as lowdb.LowdbSync<i.DB>;
 
 // Add upsert function
