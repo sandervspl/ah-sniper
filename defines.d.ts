@@ -4,5 +4,6 @@ declare namespace NodeJS {
     SERVER: string;
     FACTION: string;
     THRESHOLD: string;
+    INTERVAL_SECONDS: string;
   }
 }
