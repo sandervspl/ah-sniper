@@ -91,7 +91,7 @@ export default async function fetchItemPrices() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          value1: name,
+          value1: item.name.full,
           value2: value,
           value3: item.icon,
         }),
