@@ -39,10 +39,10 @@ export default async function fetchItemPrices() {
   const result = await fetch(
     `${HOST}/item/multi/${process.env.SERVER}/${process.env.FACTION}/${itemIds}`
   );
-  const data = await result.json() as Record<string, i.ItemPrice>;
+  const itemPrices = await result.json() as Record<string, i.ItemPrice>;
 
-  for (const name in data) {
-    const item = data[name];
+  for (const itemSlug in itemPrices) {
+    const item = itemPrices[itemSlug];
 
 
     // Convert the g/s/c value to a single digit for easy compare
@@ -53,7 +53,7 @@ export default async function fetchItemPrices() {
     // Check if we need to fetch this item
     const MIN_DIFF = Number(process.env.DB_INVALIDATE_MINUTES) * 6e4;
     const now = Date.now();
-    const dbValue = db.get('items').find({ name }).value();
+    const dbValue = db.get('items').find({ name: itemSlug }).value();
 
     if (dbValue) {
       // Wait with sending another notification
@@ -85,6 +85,11 @@ export default async function fetchItemPrices() {
         value += ` ${copper}g`;
       }
 
+      /* eslint-disable */
+      console.log(`Snipe!`);
+      console.log({ [itemSlug]: item });
+      /* eslint-enable */
+
       fetch(`https://maker.ifttt.com/trigger/ahsnipe2/with/key/${process.env.IFTTT_KEY}`, {
         method: 'POST',
         headers: {
@@ -99,7 +104,7 @@ export default async function fetchItemPrices() {
         .then(() => {
           db.get('items')
             .push({
-              name,
+              name: itemSlug,
               updatedAt: Date.now(),
               marketVal,
               buyoutVal,
