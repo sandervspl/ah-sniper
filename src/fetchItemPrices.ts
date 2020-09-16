@@ -82,10 +82,10 @@ export default async function fetchItemPrices() {
         value += `${gold}g`;
       }
       if (silver && silver > 0) {
-        value += ` ${silver}g`;
+        value += ` ${silver}s`;
       }
       if (copper && copper > 0) {
-        value += ` ${copper}g`;
+        value += ` ${copper}c`;
       }
 
       /* eslint-disable */
