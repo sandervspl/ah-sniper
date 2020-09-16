@@ -85,7 +85,7 @@ export default async function fetchItemPrices() {
         value += ` ${copper}g`;
       }
 
-      fetch('https://maker.ifttt.com/trigger/ahsnipe/with/key/clMtNJhSqX6U7WajYDsH1I', {
+      fetch(`https://maker.ifttt.com/trigger/ahsnipe2/with/key/${process.env.IFTTT_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ export default async function fetchItemPrices() {
         body: JSON.stringify({
           value1: name,
           value2: value,
-          value3: item.lastUpdated,
+          value3: item.icon,
         }),
       })
         .then(() => {
