@@ -34,7 +34,7 @@ db
 
 export default async function fetchItemPrices() {
   const itemIds = process.env.ITEM_IDS.trim().replace(' ', '').split(',').join('+');
-  const HOST = process.env.NODE_ENV === 'production' ? 'https://api.ahdwf.nl' : 'http://localhost:8080';
+  const HOST = process.env.NODE_ENV === 'production' ? 'https://api.ahdfw.nl' : 'http://localhost:8080';
 
   const result = await fetch(
     `${HOST}/item/multi/${process.env.SERVER}/${process.env.FACTION}/${itemIds}`
