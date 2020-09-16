@@ -1,6 +1,6 @@
 {
   "name": "ah-sniper",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Code for ah-sniper.",
   "main": "index.js",
   "scripts": {
