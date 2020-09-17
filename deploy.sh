@@ -116,7 +116,7 @@ sed "s/NAME/$PROJECT/g; s/port/$PORT/g; s/app_env/$APP_ENV/g; s/PROJECT/$PROJECT
 
 #Build tar and copy to server
 echo -e "🚚 $c Copying files to server $nc"
-tar -czf $FILENAME ./dist ./package.json ./package-lock.json ./tsconfig-paths-bootstrap.js ./tsconfig.json ./.env ./$PM2_CONFIG_NAME
+tar -czf $FILENAME ./dist ./package.json ./package-lock.json ./tsconfig-paths-bootstrap.js ./tsconfig.json ./$PM2_CONFIG_NAME
 scp -r ./$FILENAME $USER@$HOST:~
 rm ./$FILENAME
 rm ./$PM2_CONFIG_NAME
