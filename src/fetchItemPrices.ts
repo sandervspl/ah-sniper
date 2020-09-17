@@ -107,7 +107,11 @@ export default async function fetchItemPrices() {
           if (dbValue) {
             db.get('items')
               .find({ id: item.id })
-              .assign({ updatedAt: Date.now() })
+              .assign({
+                updatedAt: Date.now(),
+                marketVal,
+                buyoutVal,
+              })
               .write();
 
             return;
