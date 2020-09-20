@@ -98,7 +98,7 @@ export default async function fetchItemPrices() {
         },
         body: JSON.stringify({
           value1: `${item.name.full} is on AH for ${genPriceString(mb)} (market: ${genPriceString(mv)})`,
-          value2: item.name.slug,
+          value2: item.url,
           value3: item.icon,
         }),
       })
