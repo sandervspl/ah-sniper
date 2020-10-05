@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpileOnly -r tsconfig-paths/register src/index.ts",
     "build": "npm run clean && tsc",
-    "start": "NODE_ENV=production node -r ./tsconfig-paths-bootstrap.js dist/index.js",
+    "start": "NODE_ENV=production node -r ./tsconfig-paths-bootstrap.js dist/src/index.js",
     "clean": "rimraf dist/",
     "lint": "eslint --ext .ts --ext .tsx src/"
   },

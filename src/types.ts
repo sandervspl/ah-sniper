@@ -28,3 +28,15 @@ export type DB = {
     buyoutVal: number;
   }[];
 }
+
+// eslint-disable-next-line
+export namespace CMS {
+  export type Item = {
+    id: number;
+    name: string;
+    itemID: number;
+    enabled: boolean;
+    created_at: Date;
+    updated_at: Date;
+  }
+}

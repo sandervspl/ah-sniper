@@ -18,14 +18,20 @@ db
 
 
 export default async function fetchItemPrices() {
-  const itemIds = process.env.ITEM_IDS.trim().replace(' ', '').split(',').join('+');
-  const HOST = process.env.NODE_ENV === 'production' ? 'https://api.ahdfw.nl' : 'http://localhost:8080';
+  const itemIdsResult = await fetch(`${process.env.CMS_URL}/items`);
+  const itemIds = await itemIdsResult.json() as i.CMS.Item[];
+  const itemIdsStr = itemIds
+    .map((item) => item.enabled && item.itemID)
+    .filter(Boolean)
+    .join('+');
+
+  const HOST = process.env.NODE_ENV === 'production' ? process.env.API_URL : 'http://localhost:8080';
 
   // eslint-disable-next-line
   console.log(`[${(new Date()).toLocaleString()}] Checking all items...`);
 
   const result = await fetch(
-    `${HOST}/item/multi/${process.env.SERVER}/${process.env.FACTION}/${itemIds}`
+    `${HOST}/item/multi/${process.env.SERVER}/${process.env.FACTION}/${itemIdsStr}`
   );
   const itemPrices = await result.json() as Record<string, i.ItemPrice>;
 
