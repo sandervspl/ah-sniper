@@ -18,6 +18,10 @@ db
 
 
 export default async function fetchItemPrices() {
+  // eslint-disable-next-line
+  console.log(`[${(new Date()).toLocaleString()}] Checking all items...`);
+
+
   const itemIdsResult = await fetch(`${process.env.CMS_URL}/items`);
   const itemIds = await itemIdsResult.json() as i.CMS.Item[];
   const itemIdsStr = itemIds
@@ -26,9 +30,6 @@ export default async function fetchItemPrices() {
     .join('+');
 
   const HOST = process.env.NODE_ENV === 'production' ? process.env.API_URL : 'http://localhost:8080';
-
-  // eslint-disable-next-line
-  console.log(`[${(new Date()).toLocaleString()}] Checking all items...`);
 
   const result = await fetch(
     `${HOST}/item/multi/${process.env.SERVER}/${process.env.FACTION}/${itemIdsStr}`
@@ -131,27 +132,24 @@ export default async function fetchItemPrices() {
                 buyoutVal,
               })
               .write();
-
-            return;
+          } else {
+            // Insert
+            db.get('items')
+              .push({
+                id: item.id,
+                name: itemSlug,
+                updatedAt: Date.now(),
+                marketVal,
+                buyoutVal,
+              })
+              .write();
           }
 
-          // Insert
-          db.get('items')
-            .push({
-              id: item.id,
-              name: itemSlug,
-              updatedAt: Date.now(),
-              marketVal,
-              buyoutVal,
-            })
-            .write();
-        })
-        .finally(() => {
+          // eslint-disable-next-line
+          console.log(`[${(new Date()).toLocaleString()}] Checked all items.`);
+
           setTimeout(fetchItemPrices, Number(process.env.FETCH_INTERVAL_SECONDS) * 1000);
         });
     }
   }
-
-  // eslint-disable-next-line
-  console.log(`[${(new Date()).toLocaleString()}] Checked all items.`);
 }
