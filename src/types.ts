@@ -17,6 +17,7 @@ export type ItemPrice = {
   historicalValue: PriceCoins;
   minimumBuyout: PriceCoins;
   amount: number;
+  quantity: number;
 }
 
 export type DB = {

@@ -39,6 +39,12 @@ export default async function fetchItemPrices() {
     const item = itemPrices[itemSlug];
 
 
+    // Only check if item is on AH
+    if (item.quantity === 0) {
+      continue;
+    }
+
+
     // Convert the g/s/c value to a single digit for easy compare
     const mb = item.minimumBuyout;
     const mv = item.marketValue;
