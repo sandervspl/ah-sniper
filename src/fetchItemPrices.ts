@@ -58,6 +58,7 @@ export default async function fetchItemPrices() {
 
     // Check if we need to fetch this item
     const MIN_TIME_DIFF = Number(process.env.DB_INVALIDATE_MINUTES) * 60000;
+    const THRESHOLD = Number(process.env.PRICE_THRESHOLD);
     const now = Date.now();
     const dbValue = db.get('items')
       .find({ id: item.id })
@@ -73,15 +74,18 @@ export default async function fetchItemPrices() {
       if (dbValue.buyoutVal === buyoutVal) {
         continue;
       }
+
+      // Prevent spam when value is slightly less than what we found before
+      if ((buyoutVal / dbValue.buyoutVal) * 100 > THRESHOLD) {
+        continue;
+      }
     }
 
 
     // If difference of minimum buyout is substantial then we notify users
     const percDiffMarket = (buyoutVal / marketVal) * 100;
-    const percDiffPrevMinBuyout = (buyoutVal / dbValue.buyoutVal) * 100;
-    const threshold = Number(process.env.PRICE_THRESHOLD);
 
-    if (percDiffMarket <= threshold && percDiffPrevMinBuyout <= threshold) {
+    if (percDiffMarket <= THRESHOLD) {
       function genPriceString(price: i.PriceCoins) {
         const { gold,silver,copper } = price;
         let value = '';
