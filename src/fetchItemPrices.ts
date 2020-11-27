@@ -77,9 +77,11 @@ export default async function fetchItemPrices() {
 
 
     // If difference of minimum buyout is substantial then we notify users
-    const percDiff = (buyoutVal / marketVal) * 100;
+    const percDiffMarket = (buyoutVal / marketVal) * 100;
+    const percDiffPrevMinBuyout = (buyoutVal / dbValue.buyoutVal) * 100;
+    const threshold = Number(process.env.PRICE_THRESHOLD);
 
-    if (percDiff <= Number(process.env.PRICE_THRESHOLD)) {
+    if (percDiffMarket <= threshold && percDiffPrevMinBuyout <= threshold) {
       function genPriceString(price: i.PriceCoins) {
         const { gold,silver,copper } = price;
         let value = '';
