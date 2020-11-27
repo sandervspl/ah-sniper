@@ -105,8 +105,8 @@ export default async function fetchItemPrices() {
 
 
       /* eslint-disable */
-      console.log(`Snipe!`);
-      console.log({ [itemSlug]: item });
+      // console.log(`Snipe!`);
+      // console.log({ [itemSlug]: item });
       /* eslint-enable */
 
       fetch(`https://maker.ifttt.com/trigger/ahsnipe2/with/key/${process.env.IFTTT_KEY}`, {
@@ -145,6 +145,9 @@ export default async function fetchItemPrices() {
               buyoutVal,
             })
             .write();
+        })
+        .finally(() => {
+          setTimeout(fetchItemPrices, Number(process.env.FETCH_INTERVAL_SECONDS) * 1000);
         });
     }
   }
