@@ -144,12 +144,14 @@ export default async function fetchItemPrices() {
               })
               .write();
           }
-
-          // eslint-disable-next-line
-          console.log(`[${(new Date()).toLocaleString()}] Checked all items.`);
-
-          setTimeout(fetchItemPrices, Number(process.env.FETCH_INTERVAL_SECONDS) * 1000);
         });
     }
   }
+
+
+  // eslint-disable-next-line
+  console.log(`[${(new Date()).toLocaleString()}] Checked all items.`);
+
+  // Go agane
+  setTimeout(fetchItemPrices, Number(process.env.FETCH_INTERVAL_SECONDS) * 1000);
 }
